@@ -624,7 +624,7 @@ const quizData = [
     {
         question: "As per Wildlife Protection Act 1972 (WPA-1972), wildlife includes any animal, aquatic or land vegetation which forms part of any ______ (fill in the blank):",
         options: ["ecosystem", "state", "country", "habitat"],
-        correct: 3
+        correct: 4
     },
     {
         question: "The tiger has a home range of several square kilometres, regulates the ecosystem through controlling herbivore populations and trophic cascades, and people come to tiger reserves to watch tigers. Thus, the tiger can be called as:",
