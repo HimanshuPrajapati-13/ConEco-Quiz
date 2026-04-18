@@ -186,7 +186,7 @@ const quizData = [
     },
     {
         question: "The acronym HIPPO does not include:",
-        options: ["habitat loss", "invasive species", "pollution", "pollution"],
+        options: ["habitat loss", "invasive species", "pollination", "pollution"],
         correct: 2
     },
     {
@@ -466,8 +466,9 @@ const quizData = [
     },
     {
         question: "Which of the following is true for a monopoly?",
-        options: ["P = MR", "MR > MC", "MC > P", "MC > MR"],
-        correct: 3
+        options: ["P > MR", "P = MC", "MR > MC", "MR = MC"],
+
+        correct: 0
     },
     {
         question: '"Costs that do not vary with the quantity of output produced" are:',
@@ -514,7 +515,7 @@ const quizData = [
             "on income and on access to social services",
             "neither on income nor on access to social services"
         ],
-        correct: 3
+        correct: 2
     },
     {
         question: '"A poverty where a household\'s income is lower than the median income in the particular country" is known as:',
@@ -623,7 +624,7 @@ const quizData = [
     {
         question: "As per Wildlife Protection Act 1972 (WPA-1972), wildlife includes any animal, aquatic or land vegetation which forms part of any ______ (fill in the blank):",
         options: ["ecosystem", "state", "country", "habitat"],
-        correct: 0
+        correct: 3
     },
     {
         question: "The tiger has a home range of several square kilometres, regulates the ecosystem through controlling herbivore populations and trophic cascades, and people come to tiger reserves to watch tigers. Thus, the tiger can be called as:",
@@ -721,10 +722,21 @@ const quizData = [
                 optionsContainer.appendChild(optionDiv);
             });
 
+            const submitBtn = document.getElementById('submitBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
             if (answerSubmitted[currentQuestion]) {
                 showFeedback();
+                if (submitBtn) submitBtn.style.display = 'none';
+                if (nextBtn) nextBtn.style.display = 'block';
             } else {
                 hideFeedback();
+                if (submitBtn) submitBtn.style.display = 'block';
+                // Only hide Next button if you want to force submission before moving forward
+                // But user wants to MOVE to another option/question? 
+                // Let's keep Next button visible but maybe it warns if not answered? 
+                // Actually, "move to another option" implies they can just click around.
+                if (nextBtn) nextBtn.style.display = 'block'; 
             }
 
             updateProgressBar();
@@ -734,10 +746,31 @@ const quizData = [
         function selectOption(index) {
             if (answerSubmitted[currentQuestion]) return;
             
-            const question = quizQuestions[currentQuestion];
             userAnswers[currentQuestion] = index;
-            answerSubmitted[currentQuestion] = true;
             
+            // Just highlight, don't submit
+            const options = document.querySelectorAll('.option');
+            options.forEach((opt, i) => {
+                if (i === index) {
+                    opt.classList.add('selected');
+                } else {
+                    opt.classList.remove('selected');
+                }
+            });
+        }
+
+        function submitAnswer() {
+            if (currentQuestion >= quizQuestions.length) return;
+            if (answerSubmitted[currentQuestion]) return;
+            if (userAnswers[currentQuestion] === undefined) {
+                alert('Please select an option first!');
+                return;
+            }
+
+            const question = quizQuestions[currentQuestion];
+            const selectedIndex = userAnswers[currentQuestion];
+            answerSubmitted[currentQuestion] = true;
+
             const options = document.querySelectorAll('.option');
             options.forEach((opt, i) => {
                 opt.classList.remove('selected');
@@ -747,16 +780,17 @@ const quizData = [
                 if (i === question.correct) {
                     opt.classList.add('correct');
                 }
-                if (i === index && index !== question.correct) {
+                if (i === selectedIndex && selectedIndex !== question.correct) {
                     opt.classList.add('incorrect');
                 }
             });
 
-            if (index === question.correct) {
+            if (selectedIndex === question.correct) {
                 score++;
                 document.getElementById('score').textContent = `Score: ${score}`;
             }
 
+            document.getElementById('submitBtn').style.display = 'none';
             showFeedback();
         }
 
@@ -796,11 +830,6 @@ const quizData = [
         }
 
         function nextQuestion() {
-            if (userAnswers[currentQuestion] === undefined) {
-                alert('Please select an answer before proceeding!');
-                return;
-            }
-
             if (currentQuestion < quizQuestions.length - 1) {
                 currentQuestion++;
                 loadQuestion();
@@ -826,7 +855,7 @@ const quizData = [
             const nextBtn = document.getElementById('nextBtn');
             
             prevBtn.style.visibility = currentQuestion === 0 ? 'hidden' : 'visible';
-            nextBtn.textContent = currentQuestion === quizQuestions.length - 1 ? 'Submit' : 'Next';
+            nextBtn.textContent = currentQuestion === quizQuestions.length - 1 ? 'Finish' : 'Next';
         }
 
         function showResults() {
